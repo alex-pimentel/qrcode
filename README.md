@@ -159,10 +159,10 @@ User input → Customize settings → Generate → Download / Copy
 
 ## ☁️ Deploy
 
-The web version is deployed to **Cloudflare Pages** via GitHub Actions on merge to `main`, using [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (`cloudflare/wrangler-action@v3`). [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)](https://pages.cloudflare.com/)
+The web version is deployed to **Cloudflare Pages** via GitHub Actions on merge to `main`, using [Wrangler](https://developers.cloudflare.com/workers/wrangler/) (`cloudflare/wrangler-action@v4`). [![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white)](https://pages.cloudflare.com/)
 
 ```yaml
-- uses: cloudflare/wrangler-action@v3
+- uses: cloudflare/wrangler-action@v4
   with:
     apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
