@@ -1,0 +1,52 @@
+{
+  "name": "qrcode",
+  "description": "QR Code generator — web application",
+  "keywords": [
+    "qrcode",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "homepage": "https://github.com/alex-pimentel/qrcode#readme",
+  "bugs": {
+    "url": "https://github.com/alex-pimentel/qrcode/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex-pimentel/qrcode.git"
+  },
+  "license": "MIT",
+  "author": {
+    "name": "Alex Pimentel",
+    "url": "https://github.com/alex-pimentel"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/core",
+    "packages/ui",
+    "packages/web"
+  ],
+  "scripts": {
+    "test": "npm run test -w packages/web",
+    "lint": "eslint packages/",
+    "format": "prettier --check .",
+    "format:fix": "prettier --write ."
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/qrcode": "^1.5.6",
+    "@typescript-eslint/eslint-plugin": "^8.62.0",
+    "@typescript-eslint/parser": "^8.62.0",
+    "@vitejs/plugin-react": "^6.0.3",
+    "eslint": "^10.6.0",
+    "jsdom": "^29.1.1",
+    "prettier": "^3.9.4",
+    "typescript": "^5.8.2",
+    "vitest": "^4.1.9"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
