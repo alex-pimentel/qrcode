@@ -1,5 +1,6 @@
 import { useQRStore } from '../store';
 import { Button } from './ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import { Download, Copy, QrCode } from 'lucide-react';
 
 export function QRDisplay() {
@@ -23,7 +24,7 @@ export function QRDisplay() {
       <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-muted-foreground/25 bg-muted/30 p-16 text-center">
         <QrCode className="mb-4 h-12 w-12 text-muted-foreground/40" />
         <p className="text-sm text-muted-foreground">
-          Enter text or a URL above and click Generate to create a QR code
+          Fill in the fields and click Generate to create a QR code
         </p>
       </div>
     );
@@ -41,14 +42,28 @@ export function QRDisplay() {
         )}
       </div>
       <div className="flex gap-2">
-        <Button variant="outline" onClick={download}>
-          <Download />
-          {downloadLabel}
-        </Button>
-        <Button variant="outline" onClick={copyImage}>
-          <Copy />
-          Copy
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" onClick={download}>
+              <Download />
+              {downloadLabel}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Download as {outputFormat.toUpperCase()}</p>
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="outline" onClick={copyImage}>
+              <Copy />
+              Copy
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Copy image to clipboard</p>
+          </TooltipContent>
+        </Tooltip>
       </div>
     </div>
   );

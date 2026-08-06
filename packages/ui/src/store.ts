@@ -6,8 +6,20 @@ import {
   downloadSVG,
   copyToClipboard,
   DEFAULT_QR_SETTINGS,
+  buildPayload,
+  describePayload,
 } from '@qrcode/core';
-import type { QRSettings, QROutputFormat, QRHistoryEntry } from '@qrcode/core';
+import type {
+  QRSettings,
+  QRType,
+  QROutputFormat,
+  QRHistoryEntry,
+  WifiPayload,
+  PixPayload,
+  EmailPayload,
+  SmsPayload,
+  QRFrameConfig,
+} from '@qrcode/core';
 
 const HISTORY_KEY = 'qrcode-history';
 const MAX_HISTORY = 20;
@@ -41,14 +53,21 @@ export type QRState = {
 };
 
 export type QRActions = {
+  setType: (type: QRType) => void;
   setText: (text: string) => void;
+  setUrl: (url: string) => void;
+  setWifi: (wifi: Partial<WifiPayload>) => void;
+  setPix: (pix: Partial<PixPayload>) => void;
+  setEmail: (email: Partial<EmailPayload>) => void;
+  setSms: (sms: Partial<SmsPayload>) => void;
   setWidth: (width: number) => void;
   setMargin: (margin: number) => void;
   setForeground: (color: string) => void;
   setBackground: (color: string) => void;
   setErrorCorrectionLevel: (level: QRSettings['errorCorrectionLevel']) => void;
   setOutputFormat: (format: QROutputFormat) => void;
-  applyTemplate: (foreground: string, background: string) => void;
+  setFrame: (frame: Partial<QRFrameConfig>) => void;
+  applyTemplate: (foreground: string, background: string) => Promise<void>;
   generate: () => Promise<void>;
   download: () => void;
   copyImage: () => Promise<void>;
@@ -60,7 +79,7 @@ export type QRActions = {
 export type QRStore = QRState & QRActions;
 
 export const useQRStore = create<QRStore>((set, get) => ({
-  settings: { ...DEFAULT_QR_SETTINGS },
+  settings: structuredClone(DEFAULT_QR_SETTINGS),
   outputFormat: 'png',
   qrDataURL: null,
   qrSVG: null,
@@ -68,9 +87,33 @@ export const useQRStore = create<QRStore>((set, get) => ({
   error: null,
   history: loadHistory(),
 
-  setText: (text) =>
+  setType: (type) => set((state) => ({ settings: { ...state.settings, type } })),
+
+  setText: (text) => set((state) => ({ settings: { ...state.settings, text }, error: null })),
+
+  setUrl: (url) => set((state) => ({ settings: { ...state.settings, url }, error: null })),
+
+  setWifi: (wifi) =>
     set((state) => ({
-      settings: { ...state.settings, text },
+      settings: { ...state.settings, wifi: { ...state.settings.wifi, ...wifi } },
+      error: null,
+    })),
+
+  setPix: (pix) =>
+    set((state) => ({
+      settings: { ...state.settings, pix: { ...state.settings.pix, ...pix } },
+      error: null,
+    })),
+
+  setEmail: (email) =>
+    set((state) => ({
+      settings: { ...state.settings, email: { ...state.settings.email, ...email } },
+      error: null,
+    })),
+
+  setSms: (sms) =>
+    set((state) => ({
+      settings: { ...state.settings, sms: { ...state.settings.sms, ...sms } },
       error: null,
     })),
 
@@ -84,51 +127,54 @@ export const useQRStore = create<QRStore>((set, get) => ({
       settings: { ...state.settings, margin: Math.max(0, Math.min(10, margin)) },
     })),
 
-  setForeground: (foreground) =>
-    set((state) => ({
-      settings: { ...state.settings, foreground },
-    })),
+  setForeground: (foreground) => set((state) => ({ settings: { ...state.settings, foreground } })),
 
-  setBackground: (background) =>
-    set((state) => ({
-      settings: { ...state.settings, background },
-    })),
+  setBackground: (background) => set((state) => ({ settings: { ...state.settings, background } })),
 
   setErrorCorrectionLevel: (errorCorrectionLevel) =>
-    set((state) => ({
-      settings: { ...state.settings, errorCorrectionLevel },
-    })),
+    set((state) => ({ settings: { ...state.settings, errorCorrectionLevel } })),
 
   setOutputFormat: (outputFormat) => set({ outputFormat }),
 
-  applyTemplate: (foreground, background) =>
+  setFrame: (frame) =>
     set((state) => ({
-      settings: { ...state.settings, foreground, background },
+      settings: { ...state.settings, frame: { ...state.settings.frame, ...frame } },
     })),
+
+  applyTemplate: async (foreground, background) => {
+    set((state) => ({ settings: { ...state.settings, foreground, background } }));
+    await get().generate();
+  },
 
   generate: async () => {
     const { settings } = get();
-    if (!settings.text.trim()) {
-      set({ error: 'Enter text or URL to generate a QR code', qrDataURL: null });
+    const payload = buildPayload(settings);
+    if (!payload) {
+      set({
+        error: 'Fill in the required fields to generate a QR code',
+        qrDataURL: null,
+        qrSVG: null,
+      });
       return;
     }
 
     set({ generating: true, error: null });
     try {
       const [dataURL, svg] = await Promise.all([
-        generateQRDataURL(settings),
-        generateQRSVG(settings),
+        generateQRDataURL(settings, payload),
+        generateQRSVG(settings, payload),
       ]);
 
       const entry: QRHistoryEntry = {
         id: crypto.randomUUID(),
-        text: settings.text,
+        label: describePayload(settings),
+        settings: structuredClone(settings),
         dataURL,
         timestamp: Date.now(),
       };
 
       set((state) => {
-        const nextHistory = [entry, ...state.history.filter((h) => h.text !== settings.text)].slice(
+        const nextHistory = [entry, ...state.history.filter((h) => h.label !== entry.label)].slice(
           0,
           MAX_HISTORY,
         );
@@ -146,13 +192,11 @@ export const useQRStore = create<QRStore>((set, get) => ({
   },
 
   download: () => {
-    const { qrDataURL, qrSVG, outputFormat, settings } = get();
+    const { qrDataURL, qrSVG, outputFormat } = get();
     if (outputFormat === 'svg' && qrSVG) {
-      const filename = settings.text ? `qrcode.svg` : 'qrcode.svg';
-      downloadSVG(qrSVG, filename);
+      downloadSVG(qrSVG);
     } else if (qrDataURL) {
-      const filename = settings.text ? `qrcode.png` : 'qrcode.png';
-      downloadQR(qrDataURL, filename);
+      downloadQR(qrDataURL);
     }
   },
 
@@ -179,12 +223,12 @@ export const useQRStore = create<QRStore>((set, get) => ({
   },
 
   loadHistoryEntry: (entry) =>
-    set((state) => ({
-      settings: { ...state.settings, text: entry.text },
+    set({
+      settings: structuredClone(entry.settings),
       qrDataURL: entry.dataURL,
       qrSVG: null,
       error: null,
-    })),
+    }),
 }));
 
 export const selectHasQR = (state: QRStore) => state.qrDataURL !== null;

@@ -1,23 +1,9 @@
 import QRCode from 'qrcode';
 import type { QRSettings } from './types';
+import { composeFramePNG, composeFrameSVG } from './frames';
 
-export async function generateQRDataURL(settings: QRSettings): Promise<string> {
-  const { text, width, margin, foreground, background, errorCorrectionLevel } = settings;
-
-  return QRCode.toDataURL(text, {
-    width,
-    margin,
-    color: {
-      dark: foreground,
-      light: background,
-    },
-    errorCorrectionLevel,
-  });
-}
-
-export async function generateQRSVG(settings: QRSettings): Promise<string> {
-  const svg = await QRCode.toString(settings.text, {
-    type: 'svg',
+function qrCodeOptions(settings: QRSettings) {
+  return {
     width: settings.width,
     margin: settings.margin,
     color: {
@@ -25,8 +11,24 @@ export async function generateQRSVG(settings: QRSettings): Promise<string> {
       light: settings.background,
     },
     errorCorrectionLevel: settings.errorCorrectionLevel,
-  });
-  return svg;
+  };
+}
+
+function extractSvgInner(svg: string): string {
+  const start = svg.indexOf('>') + 1;
+  const end = svg.lastIndexOf('</svg>');
+  return svg.slice(start, end);
+}
+
+export async function generateQRDataURL(settings: QRSettings, text: string): Promise<string> {
+  const base = await QRCode.toDataURL(text, qrCodeOptions(settings));
+  if (settings.frame.type === 'none' && !settings.frame.caption) return base;
+  return composeFramePNG(base, settings);
+}
+
+export async function generateQRSVG(settings: QRSettings, text: string): Promise<string> {
+  const svg = await QRCode.toString(text, { ...qrCodeOptions(settings), type: 'svg' });
+  return composeFrameSVG(extractSvgInner(svg), settings);
 }
 
 export function downloadQR(dataURL: string, filename = 'qrcode.png'): void {

@@ -4,28 +4,35 @@ import { Button } from './ui/Button';
 
 export function QRTemplates() {
   const applyTemplate = useQRStore((s) => s.applyTemplate);
+  const settings = useQRStore((s) => s.settings);
+  const generating = useQRStore((s) => s.generating);
 
   return (
     <div className="flex flex-col gap-1.5">
       <span className="text-sm font-medium">Templates</span>
       <div className="grid grid-cols-2 gap-2">
-        {QR_TEMPLATES.map((tpl) => (
-          <Button
-            key={tpl.id}
-            variant="outline"
-            size="sm"
-            onClick={() => applyTemplate(tpl.foreground, tpl.background)}
-            className="h-auto justify-start gap-2 py-2"
-          >
-            <span
-              className="flex h-5 w-5 shrink-0 items-center justify-center rounded-sm border text-[8px] font-bold"
-              style={{ backgroundColor: tpl.background, color: tpl.foreground }}
+        {QR_TEMPLATES.map((tpl) => {
+          const active =
+            settings.foreground === tpl.foreground && settings.background === tpl.background;
+          return (
+            <Button
+              key={tpl.id}
+              variant={active ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => applyTemplate(tpl.foreground, tpl.background)}
+              disabled={generating}
+              className="h-auto justify-start gap-2 py-2"
             >
-              QR
-            </span>
-            <span className="truncate text-xs">{tpl.label}</span>
-          </Button>
-        ))}
+              <span
+                className="flex h-6 w-6 shrink-0 items-center justify-center rounded-sm border text-[9px] font-bold"
+                style={{ backgroundColor: tpl.background, color: tpl.foreground }}
+              >
+                QR
+              </span>
+              <span className="truncate text-xs">{tpl.label}</span>
+            </Button>
+          );
+        })}
       </div>
     </div>
   );

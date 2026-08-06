@@ -1,10 +1,14 @@
+import type { QROutputFormat } from '@qrcode/core';
+import type { QRSettings as QRSettingsType } from '@qrcode/core';
+import { canGeneratePayload } from '@qrcode/core';
 import { useQRStore } from '../store';
-import type { QRSettings as QRSettingsType, QROutputFormat } from '@qrcode/core';
-import { Label } from './ui/Label';
-import { Input } from './ui/Input';
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './ui/Select';
-import { Button } from './ui/Button';
+import { ColorField } from './ColorField';
+import { FrameField } from './FrameField';
 import { QRTemplates } from './QRTemplates';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Label } from './ui/Label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
 import { RefreshCw } from 'lucide-react';
 
 const ERROR_LEVELS: { value: QRSettingsType['errorCorrectionLevel']; label: string }[] = [
@@ -52,39 +56,19 @@ export function QRSettings() {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="qr-fg">Foreground</Label>
-          <div className="flex gap-2">
-            <div
-              className="h-9 w-9 rounded-md border shadow-sm"
-              style={{ backgroundColor: settings.foreground }}
-            />
-            <Input
-              id="qr-fg"
-              type="color"
-              value={settings.foreground}
-              onChange={(e) => setForeground(e.target.value)}
-              className="h-9 w-full cursor-pointer px-1"
-            />
-          </div>
-        </div>
+        <ColorField
+          id="qr-fg"
+          label="Foreground"
+          value={settings.foreground}
+          onChange={setForeground}
+        />
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="qr-bg">Background</Label>
-          <div className="flex gap-2">
-            <div
-              className="h-9 w-9 rounded-md border shadow-sm"
-              style={{ backgroundColor: settings.background }}
-            />
-            <Input
-              id="qr-bg"
-              type="color"
-              value={settings.background}
-              onChange={(e) => setBackground(e.target.value)}
-              className="h-9 w-full cursor-pointer px-1"
-            />
-          </div>
-        </div>
+        <ColorField
+          id="qr-bg"
+          label="Background"
+          value={settings.background}
+          onChange={setBackground}
+        />
 
         <div className="flex flex-col gap-1.5">
           <Label>Error Correction</Label>
@@ -121,9 +105,11 @@ export function QRSettings() {
         </div>
       </div>
 
+      <FrameField />
+
       <QRTemplates />
 
-      <Button variant="secondary" onClick={generate} disabled={!settings.text.trim()}>
+      <Button variant="secondary" onClick={generate} disabled={!canGeneratePayload(settings)}>
         <RefreshCw />
         Regenerate
       </Button>

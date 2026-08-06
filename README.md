@@ -2,7 +2,7 @@
 
 **QR Code generator — React + TypeScript + Vite**
 
-Web application for creating customizable QR codes from URLs or text, with color templates, error correction control, PNG/SVG export, and persistent history — fully client-side, no backend required.
+Web application for creating customizable QR codes from URLs, text, Wi-Fi networks, PIX payments, emails, and SMS messages — with color pickers, frames, auto-applying templates, error correction control, PNG/SVG export, and persistent history — fully client-side, no backend required.
 
 [![React](https://img.shields.io/badge/react-19-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://react.dev/) [![TypeScript](https://img.shields.io/badge/typescript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Vite](https://img.shields.io/badge/vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/) [![Tailwind CSS](https://img.shields.io/badge/tailwindcss-4-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/) [![Zustand](https://img.shields.io/badge/zustand-5-443E38?style=for-the-badge&logo=react&logoColor=white)](https://github.com/pmndrs/zustand) [![qrcode](https://img.shields.io/badge/qrcode-1.5-000000?style=for-the-badge)](https://www.npmjs.com/package/qrcode) [![Docker](https://img.shields.io/badge/docker-compose-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://docs.docker.com/compose/) [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
@@ -12,9 +12,11 @@ Web application for creating customizable QR codes from URLs or text, with color
 
 ## 🚀 Features
 
-- **Text & URL input** — Generate a QR code from any text or link with one click (or Enter)
-- **Custom colors** — Pick any foreground and background color
-- **Color templates** — One-click presets (Classic, Dark Mode, Blue, Green, Purple, Coral, Amber)
+- **6 QR types** — Text, URL, Wi-Fi, PIX, Email, and SMS payloads
+- **Input** — Generate a QR code from any text or link with one click (or Enter)
+- **Custom colors** — Pick any foreground and background color with `react-colorful`
+- **Frames** — Solid or decorative-corner frames with custom color, thickness, and caption
+- **Color templates** — One-click presets (Classic, Dark Mode, Blue, Green, Purple, Coral, Amber) that auto-apply and regenerate
 - **Error correction** — Choose Low (7%), Medium (15%), Quartile (25%), or High (30%)
 - **Size & margin** — Fine-tune dimensions (100–600px) and quiet-zone margin
 - **PNG + SVG export** — Download as raster PNG or vector SVG
@@ -28,13 +30,14 @@ Web application for creating customizable QR codes from URLs or text, with color
 ```
          ┌────────────────────────────────────────────────┐
          │                 packages/ui                     │
-         │  React components (QRForm, QRDisplay,           │
+         │  React components (QRTypeForm, QRDisplay,       │
          │  QRSettings, QRHistory), Zustand store          │
          └────────────────┬───────────────────────────────┘
                           │ imports
          ┌────────────────▼───────────────────────────────┐
          │                packages/core                    │
-         │  Types & defaults, qrcode wrapper,              │
+         │  Types & defaults, payload builders,            │
+         │  frame compositing, qrcode wrapper,             │
          │  PNG/SVG generation, download utilities         │
          └────────────────┬───────────────────────────────┘
                           │ imports
@@ -77,13 +80,15 @@ qrcode/
 │   │   └── src/
 │   │       ├── index.ts       # Public API
 │   │       ├── qr.ts          # qrcode wrapper, PNG/SVG, downloads
+│   │       ├── payloads.ts    # Text/URL/Wi-Fi/PIX/Email/SMS builders
+│   │       ├── frames.ts      # Frame geometry + PNG/SVG compositing
 │   │       └── types.ts       # Types, defaults & templates
 │   │
 │   ├── ui/                    # React components & state
 │   │   └── src/
 │   │       ├── App.tsx        # App shell
 │   │       ├── store.ts       # Zustand store
-│   │       ├── components/    # QRForm, QRDisplay, QRSettings, QRHistory…
+│   │       ├── components/    # QRTypeForm, QRDisplay, QRSettings, QRHistory…
 │   │       └── styles/        # Tailwind globals
 │   │
 │   └── web/                   # Web version
@@ -126,8 +131,8 @@ docker compose up --build
 
 ## 🔄 How it Works
 
-1. **Input** — Type a URL or any text
-2. **Customize** — Pick colors, a template, error correction level, size, and margin
+1. **Input** — Choose a type (Text, URL, Wi-Fi, PIX, Email, SMS) and fill in the fields
+2. **Customize** — Pick colors, a template, a frame, error correction level, size, and margin
 3. **Generate** — The `qrcode` library renders PNG and SVG entirely in the browser
 4. **Export** — Download the image or copy it to the clipboard
 5. **History** — Generated codes are saved in `localStorage` for quick reuse

@@ -1,5 +1,6 @@
 import { useQRStore } from '../store';
 import { Button } from './ui/Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from './ui/Tooltip';
 import { Trash2, Clock, ExternalLink } from 'lucide-react';
 
 export function QRHistory() {
@@ -38,31 +39,43 @@ export function QRHistory() {
           >
             <img src={entry.dataURL} alt="" className="h-8 w-8 rounded-sm" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-medium">{entry.text}</p>
+              <p className="truncate text-xs font-medium">{entry.label}</p>
               <p className="flex items-center gap-1 text-[10px] text-muted-foreground">
                 <Clock className="h-2.5 w-2.5" />
                 {formatTime(entry.timestamp)}
               </p>
             </div>
-            <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6"
-                onClick={() => loadHistoryEntry(entry)}
-                title="Load"
-              >
-                <ExternalLink className="h-3 w-3" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-destructive hover:text-destructive"
-                onClick={() => removeHistory(entry.id)}
-                title="Delete"
-              >
-                <Trash2 className="h-3 w-3" />
-              </Button>
+            <div className="flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6"
+                    onClick={() => loadHistoryEntry(entry)}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Load</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-destructive hover:text-destructive"
+                    onClick={() => removeHistory(entry.id)}
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Delete</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
         ))}
