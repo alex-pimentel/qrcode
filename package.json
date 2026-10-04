@@ -28,13 +28,13 @@
   ],
   "scripts": {
     "lint": "eslint packages/",
+    "types": "tsc -p packages/web/tsconfig.json --noEmit",
+    "build": "npm run build -w packages/web",
     "format": "prettier --check .",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
-    "types": "tsc -p packages/web/tsconfig.json --noEmit",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "build": "npm run build -w packages/web"
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@playwright/test": "^1.61.1",
