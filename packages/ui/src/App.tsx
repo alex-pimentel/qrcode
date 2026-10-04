@@ -1,34 +1,22 @@
+import { ServiceShell, UserButton } from '@agenteresolve/ui';
 import { QRTypeForm } from './components/QRTypeForm';
 import { QRDisplay } from './components/QRDisplay';
 import { QRSettings } from './components/QRSettings';
 import { QRHistory } from './components/QRHistory';
 import { Separator } from './components/ui/Separator';
 import { TooltipProvider } from './components/ui/Tooltip';
-import { QrCode } from 'lucide-react';
 
 export function App() {
   return (
-    <TooltipProvider>
-      <div className="flex min-h-screen flex-col">
-        <header className="border-b">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-            <div className="flex items-center gap-2">
-              <QrCode className="h-5 w-5" />
-              <h1 className="text-lg font-semibold">QR Code Generator</h1>
-            </div>
-            <a
-              href="https://github.com/alex-pimentel/qrcode"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-            >
-              GitHub
-            </a>
-          </div>
-        </header>
-
-        <main className="mx-auto flex w-full max-w-5xl flex-1 gap-8 px-6 py-8">
-          <aside className="flex w-64 shrink-0 flex-col gap-5 overflow-y-auto">
+    <ServiceShell
+      title="QR Code Generator"
+      description="Create customizable QR codes for URLs, text, Wi-Fi, PIX, email and SMS."
+      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+      authSlot={<UserButton />}
+    >
+      <TooltipProvider>
+        <div className="flex flex-col gap-8 lg:flex-row">
+          <aside className="flex w-full shrink-0 flex-col gap-5 lg:w-64">
             <QRSettings />
             <Separator />
             <QRHistory />
@@ -40,12 +28,8 @@ export function App() {
               <QRDisplay />
             </div>
           </div>
-        </main>
-
-        <footer className="border-t py-4 text-center text-xs text-muted-foreground">
-          MIT &copy; {new Date().getFullYear()} Alex Pimentel
-        </footer>
-      </div>
-    </TooltipProvider>
+        </div>
+      </TooltipProvider>
+    </ServiceShell>
   );
 }

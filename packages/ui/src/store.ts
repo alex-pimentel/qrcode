@@ -21,14 +21,24 @@ import type {
   QRFrameConfig,
 } from '@qrcode/core';
 
-const HISTORY_KEY = 'qrcode-history';
+const HISTORY_KEY = 'agenteresolve:qrcode:history';
+const LEGACY_HISTORY_KEY = 'qrcode-history';
 const MAX_HISTORY = 20;
 
 function loadHistory(): QRHistoryEntry[] {
   try {
     const raw = localStorage.getItem(HISTORY_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as QRHistoryEntry[];
+    if (raw) return JSON.parse(raw) as QRHistoryEntry[];
+
+    const legacy = localStorage.getItem(LEGACY_HISTORY_KEY);
+    if (legacy) {
+      const entries = JSON.parse(legacy) as QRHistoryEntry[];
+      localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+      localStorage.removeItem(LEGACY_HISTORY_KEY);
+      return entries;
+    }
+
+    return [];
   } catch {
     return [];
   }

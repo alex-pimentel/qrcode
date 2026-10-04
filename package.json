@@ -29,6 +29,8 @@
   "scripts": {
     "test": "npm run test -w packages/web",
     "lint": "eslint packages/",
+    "types": "tsc -p packages/web/tsconfig.json --noEmit",
+    "build": "npm run build -w packages/web",
     "format": "prettier --check .",
     "format:fix": "prettier --write ."
   },
