@@ -21,7 +21,7 @@ Web application for creating customizable QR codes from URLs, text, Wi-Fi networ
 - **Size & margin** — Fine-tune dimensions (100–600px) and quiet-zone margin
 - **PNG + SVG export** — Download as raster PNG or vector SVG
 - **Copy to clipboard** — One-click copy of the generated image
-- **History** — Last 20 codes persisted in `localStorage`, with load/delete/clear actions
+- **History** — Last 20 codes persisted in `localStorage` under the namespaced key `agenteresolve:qrcode:history` (legacy `qrcode-history` entries migrate automatically), with load/delete/clear actions
 
 ---
 
@@ -89,7 +89,7 @@ qrcode/
 │   │       ├── App.tsx        # App shell
 │   │       ├── store.ts       # Zustand store
 │   │       ├── components/    # QRTypeForm, QRDisplay, QRSettings, QRHistory…
-│   │       └── styles/        # Tailwind globals
+│   │       └── styles/        # Tailwind globals (shared tokens)
 │   │
 │   └── web/                   # Web version
 │       └── src/
@@ -147,14 +147,26 @@ User input → Customize settings → Generate → Download / Copy
 
 ---
 
+## 🎨 Shared shell & optional auth
+
+The app renders inside the Agenteresolve **Service Shell** (`ServiceShell` + `AuthProvider` + `UserButton`) consumed as a git dependency from [`@agenteresolve/ui`](https://github.com/alex-pimentel/agenteresolve-ui) (`github:alex-pimentel/agenteresolve-ui`), and imports its shared token layer (`styles.css`) into the Tailwind v4 entry, aliasing the legacy `primary` / `secondary` / `accent` tokens onto the shared brand tokens.
+
+- **Clerk is optional** — without `VITE_CLERK_PUBLISHABLE_KEY`, the shell shows a neutral **Entrar** prompt and QR generation works exactly as before; nothing is gated on login.
+- **No server** — QR payloads and history never leave the browser; history stays in `localStorage`.
+- With `VITE_CLERK_PUBLISHABLE_KEY` present at build time, the header renders Clerk's `UserButton`.
+- `npm run build`/`npm ci` fetch the package over HTTPS; the `prepare` script bundles `dist/` during install (npm needs no SSH credentials for the public repo).
+
+---
+
 ## 🧪 Commands
 
 | Command                           | Description                       |
 | --------------------------------- | --------------------------------- |
 | `npm run dev -w packages/web`     | Web dev server (Vite)             |
-| `npm run build -w packages/web`   | Build web for production          |
+| `npm run build`                   | Build web for production          |
 | `npm run preview -w packages/web` | Preview the production build      |
 | `npm run lint`                    | ESLint all packages               |
+| `npm run types`                   | Type-check all packages (tsc)     |
 | `npm test`                        | Run unit tests (Vitest)           |
 | `npx playwright test`             | Run end-to-end tests (Playwright) |
 | `npm run format`                  | Prettier check all files          |
