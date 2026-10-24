@@ -10,33 +10,33 @@
     "./App.css": "./src/App.css"
   },
   "peerDependencies": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-icons": "^5.0.0",
     "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.1",
     "@tailwindcss/vite": "^4.3.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-icons": "^5.6.0",
     "tailwindcss": "^4.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.14"
+    "zustand": "^5.0.15"
   },
   "dependencies": {
-    "@agenteresolve/ui": "github:alex-pimentel/agenteresolve-ui",
-    "@radix-ui/react-label": "^2.1.10",
-    "@radix-ui/react-popover": "^1.1.23",
-    "@radix-ui/react-select": "^2.3.2",
-    "@radix-ui/react-separator": "^1.1.10",
+    "@agenteresolve/ui": "git+https://github.com/alex-pimentel/agenteresolve-ui.git#bf518e9533888f41160c1090a2c133806f4d57e6",
+    "@radix-ui/react-label": "^2.1.17",
+    "@radix-ui/react-popover": "^1.3.1",
+    "@radix-ui/react-select": "^2.4.1",
+    "@radix-ui/react-separator": "^1.2.0",
     "@radix-ui/react-slot": "^1.3.0",
-    "@radix-ui/react-tooltip": "^1.2.10",
+    "@radix-ui/react-tooltip": "^1.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^1.21.0",
-    "react-colorful": "^5.8.0",
+    "lucide-react": "^1.61.0",
+    "react-colorful": "^5.8.1",
     "tailwind-merge": "^3.6.0"
   }
 }
